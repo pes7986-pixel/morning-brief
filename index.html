@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<style>*,*::before,*::after{box-sizing:border-box}body{margin:0}</style>
+<title>모닝 브리핑</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@700;800&family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one centered reading column, newspaper masthead on top, sections stacked with ruled heads */
+:root {
+  --paper: #f6f7f5;
+  --ink: #17191c;
+  --ink-soft: #4a4f57;
+  --ink-faint: #7b818a;
+  --rule: #cfd3d8;
+  --rule-strong: #17191c;
+  --accent: #1d3b5c;
+  --up: #c4302b;
+  --down: #2058b8;
+  --star: #a8741a;
+  --panel: #eceeeb;
+  --f-display: "Nanum Myeongjo", "AppleMyungjo", "Batang", serif;
+  --f-body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --f-data: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #15171a; --ink: #e8e9e6; --ink-soft: #b7bbc1; --ink-faint: #868c95;
+    --rule: #33373d; --rule-strong: #e8e9e6; --accent: #9dbbe0;
+    --up: #ff7a72; --down: #7fa8ff; --star: #e0b25a; --panel: #1d2024;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #15171a; --ink: #e8e9e6; --ink-soft: #b7bbc1; --ink-faint: #868c95;
+  --rule: #33373d; --rule-strong: #e8e9e6; --accent: #9dbbe0;
+  --up: #ff7a72; --down: #7fa8ff; --star: #e0b25a; --panel: #1d2024;
+  color-scheme: dark;
+}
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 18px;
+  line-height: 1.7;
+  -webkit-text-size-adjust: 100%;
+}
+.page {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 2rem 4rem;
+}
+a { color: inherit; }
+a:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* Masthead */
+.mast { border-top: 4px solid var(--rule-strong); border-bottom: 1px solid var(--rule-strong); padding-block: 1.1rem 0.9rem; text-align: center; }
+.mast-name { font-family: var(--f-display); font-weight: 800; font-size: clamp(2.2rem, 7vw, 3.2rem); letter-spacing: 0.02em; line-height: 1.15; margin: 0; }
+.mast-sub { font-size: 0.78rem; color: var(--ink-faint); letter-spacing: 0.18em; margin-top: 0.2rem; }
+.dateline { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 0.75rem; border-bottom: 1px solid var(--rule); padding-block: 0.7rem; }
+.dateline-date { font-family: var(--f-display); font-weight: 700; font-size: 1.15rem; text-align: center; }
+.navbtn { font: inherit; font-size: 0.88rem; color: var(--ink-soft); background: none; border: 0; padding: 0.5rem 0.25rem; cursor: pointer; min-height: 44px; }
+.navbtn:hover:not(:disabled) { color: var(--ink); text-decoration: underline; }
+.navbtn:disabled { color: var(--rule); cursor: default; }
+.navbtn.prev { justify-self: start; }
+.navbtn.next { justify-self: end; }
+.picker { display: flex; justify-content: center; gap: 0.5rem; align-items: center; padding-block: 0.6rem; font-size: 0.85rem; color: var(--ink-faint); border-bottom: 1px solid var(--rule); }
+.picker select { font: inherit; font-size: 0.9rem; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); border-radius: 2px; padding: 0.3rem 0.5rem; min-height: 40px; }
+
+/* Lede */
+.lede { padding-block: 1.6rem 1.4rem; border-bottom: 1px solid var(--rule-strong); }
+.kicker { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.16em; color: var(--accent); margin: 0 0 0.6rem; }
+.lede ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 0.55rem; counter-reset: l; }
+.lede li { counter-increment: l; display: grid; grid-template-columns: 1.6rem 1fr; font-family: var(--f-display); font-weight: 700; font-size: 1.2rem; line-height: 1.5; text-wrap: balance; }
+.lede li::before { content: counter(l); font-family: var(--f-data); font-weight: 500; font-size: 0.85rem; color: var(--ink-faint); padding-top: 0.25rem; }
+
+/* Sections */
+section.sec { padding-block: 1.8rem 0.4rem; }
+.sec-head { display: flex; align-items: baseline; gap: 0.7rem; border-bottom: 2px solid var(--rule-strong); padding-bottom: 0.35rem; margin-bottom: 0.4rem; }
+.sec-no { font-family: var(--f-data); font-size: 0.85rem; color: var(--ink-faint); }
+.sec-title { font-family: var(--f-display); font-weight: 800; font-size: 1.55rem; margin: 0; }
+.sec-note { margin-left: auto; font-size: 0.8rem; color: var(--ink-faint); }
+.story { padding-block: 1rem; border-bottom: 1px solid var(--rule); }
+.story:last-child { border-bottom: 0; }
+.story h3 { font-family: var(--f-display); font-weight: 700; font-size: 1.22rem; line-height: 1.45; margin: 0 0 0.35rem; text-wrap: balance; }
+.story p { margin: 0; color: var(--ink-soft); }
+.story p + p { margin-top: 0.6rem; }
+.story .why { margin-top: 0.45rem; font-size: 0.92rem; color: var(--ink); }
+.story .why b { font-weight: 600; color: var(--accent); margin-right: 0.35rem; }
+.src { display: inline-block; margin-top: 0.45rem; font-size: 0.8rem; color: var(--ink-faint); text-decoration: none; border-bottom: 1px solid var(--rule); }
+.src:hover { color: var(--ink); border-color: var(--ink); }
+.star { color: var(--star); margin-right: 0.3rem; }
+.sub-head { font-family: var(--f-display); font-weight: 700; font-size: 1.1rem; margin: 1.3rem 0 0; padding-bottom: 0.25rem; border-bottom: 1px solid var(--rule); color: var(--ink-soft); }
+
+/* Market table */
+.quotes { width: 100%; border-collapse: collapse; margin-top: 0.6rem; font-variant-numeric: tabular-nums; }
+.quotes th, .quotes td { padding: 0.55rem 0; border-bottom: 1px solid var(--rule); text-align: right; }
+.quotes th { text-align: left; font-weight: 500; }
+.quotes th small { display: block; font-size: 0.75rem; color: var(--ink-faint); font-weight: 400; }
+.quotes td { font-family: var(--f-data); font-size: 0.98rem; }
+.quotes tr.mine th { font-weight: 600; }
+.chg.up { color: var(--up); }
+.chg.down { color: var(--down); }
+.chg.flat { color: var(--ink-faint); }
+.asof { font-size: 0.78rem; color: var(--ink-faint); margin-top: 0.4rem; }
+.reasons { margin: 0.8rem 0 0; padding-left: 1.1rem; color: var(--ink-soft); }
+.reasons li { margin-block: 0.25rem; }
+.movers { list-style: none; margin: 0.4rem 0 0; padding: 0; }
+.movers li { display: grid; grid-template-columns: 7.5rem 4.5rem 1fr; gap: 0.6rem; padding-block: 0.45rem; border-bottom: 1px solid var(--rule); font-size: 0.95rem; align-items: baseline; }
+.movers .nm { font-weight: 500; }
+.movers .chg { font-family: var(--f-data); text-align: right; }
+.movers .nt { color: var(--ink-soft); font-size: 0.88rem; min-width: 0; }
+@media (max-width: 480px) {
+  .movers li { grid-template-columns: 1fr auto; }
+  .movers .nt { grid-column: 1 / -1; }
+}
+
+.foot { margin-top: 2.5rem; border-top: 4px solid var(--rule-strong); padding-top: 0.8rem; font-size: 0.78rem; color: var(--ink-faint); line-height: 1.6; }
+.empty { padding-block: 3rem; text-align: center; color: var(--ink-soft); }
+.empty h2 { font-family: var(--f-display); font-size: 1.35rem; color: var(--ink); margin: 0 0 0.4rem; }
+@media (prefers-reduced-motion: no-preference) { #brief { transition: opacity .15s ease; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="mast">
+    <h1 class="mast-name">모닝 브리핑</h1>
+    <div class="mast-sub">MORNING BRIEF · 매일 오전 6시</div>
+  </header>
+
+  <nav class="dateline" aria-label="날짜 이동">
+    <button class="navbtn prev" id="prevBtn" type="button" disabled>◀ 이전</button>
+    <div class="dateline-date" id="dateLabel">브리핑을 불러오는 중</div>
+    <button class="navbtn next" id="nextBtn" type="button" disabled>다음 ▶</button>
+  </nav>
+  <div class="picker">
+    <label for="datePick">지난 브리핑</label>
+    <select id="datePick" disabled><option>—</option></select>
+  </div>
+
+  <main id="brief">
+    <div class="empty">
+      <h2>브리핑을 불러오는 중입니다</h2>
+      <p>매일 오전 6시에 그날의 브리핑이 추가되고, 지난 날짜는 위에서 골라 볼 수 있습니다.</p>
+    </div>
+  </main>
+
+  <footer class="foot">
+    각 기사는 출처 링크를 따라 원문을 확인할 수 있습니다. 시세는 보도 시점 기준이며 투자 판단의 근거로 쓰기 전에 증권사 앱에서 다시 확인하세요.
+  </footer>
+</div>
+
+<script>
+(function () {
+  const WEEK = ["일", "월", "화", "수", "목", "금", "토"];
+  const $ = (id) => document.getElementById(id);
+  let briefs = [];
+  let current = null;
+
+  function el(tag, cls, text) {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+  function fmtDate(id) {
+    const [y, m, d] = id.split("-").map(Number);
+    const w = WEEK[new Date(Date.UTC(y, m - 1, d)).getUTCDay()];
+    return y + "년 " + m + "월 " + d + "일 " + w + "요일";
+  }
+  function shortDate(id) {
+    const [, m, d] = id.split("-").map(Number);
+    return m + "." + d;
+  }
+  function chgClass(s) {
+    if (typeof s !== "string") return "flat";
+    if (s.trim().startsWith("+") || s.includes("▲")) return "up";
+    if (s.trim().startsWith("-") || s.trim().startsWith("−") || s.includes("▼")) return "down";
+    return "flat";
+  }
+  function chgText(s) {
+    const c = chgClass(s);
+    if (c === "up") return "▲ " + s.replace(/^[+▲]\s*/, "");
+    if (c === "down") return "▼ " + s.replace(/^[-−▼]\s*/, "");
+    return s;
+  }
+  function source(item) {
+    if (!item.url) return null;
+    const a = el("a", "src", (item.source || "출처") + " ↗");
+    a.href = item.url; a.target = "_blank"; a.rel = "noopener noreferrer";
+    return a;
+  }
+  function story(item) {
+    const s = el("article", "story");
+    const h = el("h3");
+    if (item.star) h.appendChild(el("span", "star", "★"));
+    h.appendChild(document.createTextNode(item.title));
+    s.appendChild(h);
+    // summary is one string, or an array of paragraphs for longer stories
+    if (item.summary) [].concat(item.summary).forEach((para) => s.appendChild(el("p", null, para)));
+    if (item.why) {
+      const w = el("p", "why");
+      w.appendChild(el("b", null, "왜 중요한가"));
+      w.appendChild(document.createTextNode(item.why));
+      s.appendChild(w);
+    }
+    const src = source(item);
+    if (src) s.appendChild(src);
+    return s;
+  }
+  function section(no, title, note) {
+    const sec = el("section", "sec");
+    const head = el("div", "sec-head");
+    head.appendChild(el("span", "sec-no", no));
+    head.appendChild(el("h2", "sec-title", title));
+    if (note) head.appendChild(el("span", "sec-note", note));
+    sec.appendChild(head);
+    return sec;
+  }
+  function storyList(sec, items) {
+    (items || []).forEach((it) => sec.appendChild(story(it)));
+  }
+
+  function renderInvest(inv) {
+    const sec = section("03", "투자", inv.title || "");
+    const t = el("table", "quotes");
+    const tb = el("tbody");
+    (inv.quotes || []).forEach((q) => {
+      const tr = el("tr", q.mine ? "mine" : null);
+      const th = el("th");
+      th.appendChild(document.createTextNode(q.name));
+      if (q.note) th.appendChild(el("small", null, q.note));
+      tr.appendChild(th);
+      tr.appendChild(el("td", null, q.value || "—"));
+      tr.appendChild(el("td", "chg " + chgClass(q.change), q.change ? chgText(q.change) : "—"));
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb);
+    const wrap = el("div"); wrap.style.overflowX = "auto";
+    wrap.appendChild(t);
+    sec.appendChild(wrap);
+    if (inv.asOf) sec.appendChild(el("p", "asof", inv.asOf));
+    if (inv.reasons && inv.reasons.length) {
+      sec.appendChild(el("h3", "sub-head", "오늘 시장을 움직인 이유"));
+      const ul = el("ul", "reasons");
+      inv.reasons.forEach((r) => ul.appendChild(el("li", null, r)));
+      sec.appendChild(ul);
+    }
+    if (inv.movers && inv.movers.length) {
+      sec.appendChild(el("h3", "sub-head", "S&P500 상위 종목"));
+      const ul = el("ul", "movers");
+      inv.movers.forEach((m) => {
+        const li = el("li");
+        li.appendChild(el("span", "nm", m.name));
+        li.appendChild(el("span", "chg " + chgClass(m.change), m.change ? chgText(m.change) : "—"));
+        li.appendChild(el("span", "nt", m.note || ""));
+        ul.appendChild(li);
+      });
+      sec.appendChild(ul);
+    }
+    storyList(sec, inv.stories);
+    return sec;
+  }
+
+  function renderBrief(b) {
+    const main = $("brief");
+    main.replaceChildren();
+    if (b && b.error) {
+      const e = el("div", "empty");
+      e.appendChild(el("h2", null, "이 날의 브리핑을 불러오지 못했습니다"));
+      main.appendChild(e);
+      return;
+    }
+    if (!b && arguments[1] === "loading") {
+      main.appendChild(el("div", "empty", "불러오는 중입니다"));
+      return;
+    }
+    if (!b) {
+      const e = el("div", "empty");
+      e.appendChild(el("h2", null, "아직 브리핑이 없습니다"));
+      e.appendChild(el("p", null, "매일 오전 6시에 그날의 브리핑이 여기에 추가됩니다."));
+      main.appendChild(e);
+      return;
+    }
+    if (b.summary && b.summary.length) {
+      const lede = el("div", "lede");
+      lede.appendChild(el("p", "kicker", "오늘의 3줄 요약"));
+      const ol = el("ol");
+      b.summary.forEach((s) => ol.appendChild(el("li", null, s)));
+      lede.appendChild(ol);
+      main.appendChild(lede);
+    }
+    const k = section("01", "한국"); storyList(k, b.korea); main.appendChild(k);
+    const w = section("02", "세계"); storyList(w, b.world); main.appendChild(w);
+    if (b.invest) main.appendChild(renderInvest(b.invest));
+    const t = section("04", "AI · 반도체", "★ SPAD 관련");
+    t.appendChild(el("h3", "sub-head", "AI"));
+    storyList(t, b.ai);
+    t.appendChild(el("h3", "sub-head", "반도체"));
+    storyList(t, b.semi);
+    main.appendChild(t);
+  }
+
+  function show(id) {
+    const i = briefs.findIndex((b) => b.id === id);
+    const idx = i >= 0 ? i : briefs.length - 1;
+    current = idx >= 0 ? briefs[idx] : null;
+    $("dateLabel").textContent = current ? fmtDate(current.id) : "브리핑 없음";
+    const prev = briefs[idx - 1], next = briefs[idx + 1];
+    $("prevBtn").disabled = !prev;
+    $("nextBtn").disabled = !next;
+    $("prevBtn").textContent = prev ? "◀ " + shortDate(prev.id) : "◀ 이전";
+    $("nextBtn").textContent = next ? shortDate(next.id) + " ▶" : "다음 ▶";
+    $("datePick").value = current ? current.id : "";
+    const target = current;
+    if (target && !target.loaded) {
+      renderBrief(null, "loading");
+      loadBrief(target).then(() => { if (current === target) renderBrief(target); });
+    } else renderBrief(current);
+    try { if (current) history.replaceState(null, "", "#" + current.id); } catch (e) {}
+  }
+
+  function fillPicker() {
+    const sel = $("datePick");
+    sel.replaceChildren();
+    briefs.slice().reverse().forEach((b) => {
+      const o = el("option", null, fmtDate(b.id));
+      o.value = b.id;
+      sel.appendChild(o);
+    });
+    sel.disabled = briefs.length === 0;
+  }
+
+  $("prevBtn").addEventListener("click", () => {
+    const i = briefs.indexOf(current);
+    if (i > 0) { show(briefs[i - 1].id); window.scrollTo(0, 0); }
+  });
+  $("nextBtn").addEventListener("click", () => {
+    const i = briefs.indexOf(current);
+    if (i >= 0 && i < briefs.length - 1) { show(briefs[i + 1].id); window.scrollTo(0, 0); }
+  });
+  $("datePick").addEventListener("change", (e) => { show(e.target.value); window.scrollTo(0, 0); });
+
+  async function loadBrief(b) {
+    try {
+      const res = await fetch("data/" + b.id + ".json", { cache: "no-cache" });
+      if (!res.ok) throw new Error(res.status);
+      Object.assign(b, await res.json());
+    } catch (e) { b.error = true; }
+    b.loaded = true;
+  }
+
+  async function start() {
+    let ids = [];
+    try {
+      const res = await fetch("data/index.json", { cache: "no-cache" });
+      if (!res.ok) throw new Error(res.status);
+      ids = (await res.json()).filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d)).sort();
+    } catch (e) {
+      $("dateLabel").textContent = "불러오기 실패";
+      const main = $("brief");
+      main.replaceChildren();
+      const em = el("div", "empty");
+      em.appendChild(el("h2", null, "브리핑 목록을 불러오지 못했습니다"));
+      em.appendChild(el("p", null, "잠시 뒤 새로고침해 주세요."));
+      main.appendChild(em);
+      return;
+    }
+    briefs = ids.map((id) => ({ id }));
+    fillPicker();
+    const wanted = (location.hash || "").slice(1);
+    show(wanted && briefs.some((b) => b.id === wanted) ? wanted : null);
+  }
+  start();
+})();
+</script>
+</body>
+</html>
