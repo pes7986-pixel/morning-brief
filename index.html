@@ -105,6 +105,8 @@ section.sec { padding-block: 1.8rem 0.4rem; }
 .quotes th small { display: block; font-size: 0.75rem; color: var(--ink-faint); font-weight: 400; }
 .quotes td { font-family: var(--f-data); font-size: 0.98rem; }
 .quotes tr.mine th { font-weight: 600; }
+.quotes thead th { font-size: 0.78rem; font-weight: 500; color: var(--ink-faint); border-bottom: 2px solid var(--rule-strong); white-space: nowrap; padding-left: 0.6rem; }
+.quotes td { padding-left: 0.6rem; }
 .chg.up { color: var(--up); }
 .chg.down { color: var(--down); }
 .chg.flat { color: var(--ink-faint); }
@@ -169,14 +171,17 @@ section.sec { padding-block: 1.8rem 0.4rem; }
     if (text != null) n.textContent = text;
     return n;
   }
+  // an id may carry a tag after the date (e.g. 2026-11-11-earnings): a second page for the same day
+  const TAGS = { earnings: "실적발표" };
+  function tagOf(id) { return TAGS[id.split("-")[3]] || ""; }
   function fmtDate(id) {
     const [y, m, d] = id.split("-").map(Number);
     const w = WEEK[new Date(Date.UTC(y, m - 1, d)).getUTCDay()];
-    return y + "년 " + m + "월 " + d + "일 " + w + "요일";
+    return y + "년 " + m + "월 " + d + "일 " + w + "요일" + (tagOf(id) ? ", " + tagOf(id) : "");
   }
   function shortDate(id) {
     const [, m, d] = id.split("-").map(Number);
-    return m + "." + d;
+    return m + "." + d + (tagOf(id) ? " " + tagOf(id) : "");
   }
   function chgClass(s) {
     if (typeof s !== "string") return "flat";
@@ -268,6 +273,42 @@ section.sec { padding-block: 1.8rem 0.4rem; }
     return sec;
   }
 
+  function pctCell(v) {
+    const approx = /^약\s*/.test(v || "");
+    const core = (v || "").replace(/^약\s*/, "");
+    const td = el("td", "chg " + chgClass(core), core ? (approx ? "약 " : "") + chgText(core) : "—");
+    return td;
+  }
+  function renderEarningsSection(s) {
+    const sec = section(s.no, s.title, s.note);
+    if (s.rows && s.rows.length) {
+      const t = el("table", "quotes");
+      if (s.head) {
+        const thead = el("thead"), tr = el("tr");
+        s.head.forEach((h, i) => { const c = el("th", null, h); if (i > 0) c.style.textAlign = "right"; tr.appendChild(c); });
+        thead.appendChild(tr); t.appendChild(thead);
+      }
+      const tb = el("tbody");
+      s.rows.forEach((r) => {
+        const tr = el("tr");
+        const th = el("th");
+        th.appendChild(document.createTextNode(r.name));
+        if (r.note) th.appendChild(el("small", null, r.note));
+        tr.appendChild(th);
+        tr.appendChild(pctCell(r.d1));
+        tr.appendChild(pctCell(r.cum));
+        tb.appendChild(tr);
+      });
+      t.appendChild(tb);
+      const wrap = el("div"); wrap.style.overflowX = "auto";
+      wrap.appendChild(t);
+      sec.appendChild(wrap);
+    }
+    if (s.asOf) sec.appendChild(el("p", "asof", s.asOf));
+    storyList(sec, s.stories);
+    return sec;
+  }
+
   function renderBrief(b) {
     const main = $("brief");
     main.replaceChildren();
@@ -295,6 +336,10 @@ section.sec { padding-block: 1.8rem 0.4rem; }
       b.summary.forEach((s) => ol.appendChild(el("li", null, s)));
       lede.appendChild(ol);
       main.appendChild(lede);
+    }
+    if (b.type === "earnings") {
+      (b.sections || []).forEach((s) => main.appendChild(renderEarningsSection(s)));
+      return;
     }
     const k = section("01", "한국"); storyList(k, b.korea); main.appendChild(k);
     const w = section("02", "세계"); storyList(w, b.world); main.appendChild(w);
@@ -361,7 +406,7 @@ section.sec { padding-block: 1.8rem 0.4rem; }
     try {
       const res = await fetch("data/index.json", { cache: "no-cache" });
       if (!res.ok) throw new Error(res.status);
-      ids = (await res.json()).filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d)).sort();
+      ids = (await res.json()).filter((d) => /^\d{4}-\d{2}-\d{2}(-[a-z]+)?$/.test(d)).sort();
     } catch (e) {
       $("dateLabel").textContent = "불러오기 실패";
       const main = $("brief");
